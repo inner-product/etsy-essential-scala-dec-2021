@@ -167,3 +167,107 @@ final case class Order(customer: Customer, delivery: DeliveryDetails, items: Lis
 
 Algebraic data types are a closed world! You cannot extend them without modifying existing code. This gives us some guarantees about correctness (and the compiler helps to enforce these as well)
 
+
+## Scala Style
+
+Similar to Java style.
+
+Type names (class, trait, object [most of the time]): start with a capital letter
+Otherwise (parameter names, variables): start with a lower case letter
+Use CamelCase. Means capitalize start of words inside a name.
+
+Good:
+
+ThisIsAType
+MyAmazingTrait
+
+val someName = anExpression
+
+
+Bad:
+
+scala_is_not_python_or_rust
+NO_NEED_TO_SHOUT
+
+## Structural Recursion
+Motivation: when I want to transform an algebraic data type into anything else I can use structural recursion.
+
+[Cedric: this is proof by induction]
+
+Two implementation strategies:
+- pattern matching
+- dynamic dispatch
+
+### Pattern Matching
+A way to implement structural recursion
+
+```scala
+// A is B or C
+sealed trait A
+final case class B() extends A
+final case class C() extends A
+
+anA match {
+  case B() => ???
+  case C() => ???
+}
+
+// A is B and C
+final case class A(b: B, c: C)
+
+anA match {
+  case A(b, c) => ???
+}
+```
+
+Pattern matching is an expression
+
+```scala
+<anExpr> match {
+  case <pat1> => <expr1>
+  case <pat2> => <expr2>
+}
+```
+
+<anExpr> an expression that evaluates to the value we are matching against.
+
+<pat1> ... are pattern
+<expr1> ... are expressions
+
+Evaluate the first <expr> for which the patterns match the value we are matching against.
+
+Patterns can be:
+- literals, like `1` or `"Hello"`
+- a name, which matches anything and gives the name to the matched value in the RHS expression
+
+  ```scala
+  1 match {
+    case theNumber => s"The number is $theNumber"
+  }
+  ```
+- `_` matches anything but doesn't give it a name
+- a case class pattern
+  If we have `final case class A(theB: B, theC: C)`
+  We can write a pattern `A(<pat>, <pat>)`
+  
+  ```scala
+  final case class A(aNumber: Int, aString: String) 
+  
+  def example(a: A): String =
+    a match {
+      case A(1, "") => "just 1 and empty string"
+      case A(anyNumber, "") => "any number with empty string"
+      case A(aNumber, aString) => "any number and any string"
+      case A(aNumber, _) => "any number and don't care about the string"
+    }
+  ```
+  
+  
+### Case Classes
+Immutable containers of data. Tuples with named elements.
+
+Give us:
+- nice output when converted to a string
+- equality is by value not by reference
+- don't have to use `new` keyword to construct
+- (hashCode is implemented for us)
