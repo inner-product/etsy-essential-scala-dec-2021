@@ -63,7 +63,7 @@ Use the types of input and outputs to guide the implementation
 
 ## Recursion in Structural Recursion
 
-When the data is recursive the method is also recursive.
+When the data is recursive the method is also recursive on that data.
 
 
 ## Scala Language
